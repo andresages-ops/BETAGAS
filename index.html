@@ -7,12 +7,14 @@
     <meta name="theme-color" content="#112116"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="apple-mobile-web-app-title" content="Fuel">
     
     <title>Fuel Dashboard</title>
     
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1598/1598196.png">
-
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZ1ZWwgRGFzaGJvYXJkIiwKICAic2hvcnRfbmFtZSI6ICJGdWVsIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMTIxMTYiLAogICJ0aGVtZV9jb2xvciI6ICIjMTEyMTE2IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvMTU5OC8xNTk4MTk2LnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==" />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4872/4872272.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/4872/4872272.png">
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZ1ZWwgRGFzaGJvYXJkIiwKICAic2hvcnRfbmFtZSI6ICJGdWVsIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMTIxMTYiLAogICJ0aGVtZV9jb2xvciI6ICIjMTEyMTE2IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvNDg3Mi80ODcyMjcyLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==" />
     
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -58,7 +60,9 @@
         .view-section.active { display: flex; flex-direction: column; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
+        /* GAUGE: Rotado -90deg para empezar a las 12:00 */
         .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 200px; transform: rotate(-90deg); } 
+        
         .circle-bg { fill: none; stroke: #2A3830; }
         .circle { fill: none; stroke-width: 2.8; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; }
 
@@ -66,6 +70,7 @@
         #type-regular:checked + label { background-color: #19e65e; }
         #type-premium:checked + label { background-color: #ef4444; color: #fff; }
         
+        /* Select Personalizado */
         .custom-select {
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -75,6 +80,7 @@
             padding-right: 2.5rem;
         }
 
+        /* Animations */
         #toast-notification { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; }
         .toast-hidden { transform: translate(-50%, -150%) !important; opacity: 0; pointer-events: none; }
         .toast-visible { transform: translate(-50%, 20px) !important; opacity: 1; }
@@ -83,6 +89,7 @@
         .dropdown-hidden { transform: scale(0.95); opacity: 0; pointer-events: none; }
         .dropdown-visible { transform: scale(1); opacity: 1; pointer-events: auto; }
 
+        /* Spinner */
         #ptr-spinner {
             position: fixed; top: 15px; left: 50%; transform: translateX(-50%) scale(0); z-index: 200;
             background: #253329; border: 1px solid #19e65e; border-radius: 50%; padding: 8px;
@@ -147,7 +154,7 @@
                         <path id="efficiency-circle" class="circle stroke-primary stroke-[3px]" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                     </svg>
                     <div class="absolute inset-0 flex flex-col justify-end items-center z-10 pb-[50%]">
-                        <span id="dash-efficiency-val" class="text-5xl font-extrabold tracking-tighter leading-none translate-y-1">--</span>
+                        <span id="dash-efficiency-val" class="text-5xl font-extrabold tracking-tighter leading-none translate-y-3">--</span>
                     </div>
                     <div class="absolute inset-0 flex items-end justify-center z-10 pb-12">
                         <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">km/l</span>
