@@ -10,8 +10,9 @@
     
     <title>Fuel Dashboard</title>
     
-    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZ1ZWwgRGFzaGJvYXJkIiwKICAic2hvcnRfbmFtZSI6ICJGdWVsIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMTIxMTYiLAogICJ0aGVtZV9jb2xvciI6ICIjMTEyMTE2IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvNDg3Mi80ODcyMjcyLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==" />
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4872/4872272.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1598/1598196.png">
+
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkZ1ZWwgRGFzaGJvYXJkIiwKICAic2hvcnRfbmFtZSI6ICJGdWVsIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxMTIxMTYiLAogICJ0aGVtZV9jb2xvciI6ICIjMTEyMTE2IiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvMTU5OC8xNTk4MTk2LnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==" />
     
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -48,7 +49,7 @@
             overscroll-behavior-y: contain; 
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            background-color: #112116; /* Asegura fondo correcto en rebote */
+            background-color: #112116; 
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -120,7 +121,7 @@
         <header class="sticky top-0 z-30 flex items-center justify-between px-4 py-4 bg-background-dark/95 backdrop-blur-md border-b border-white/5 pt-safe">
             <div class="flex items-center gap-2">
                 <h1 class="text-base font-bold tracking-tight">Fuel Dashboard</h1>
-                <span class="text-[9px] font-bold bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/20">v2.3</span>
+                <span class="text-[9px] font-bold bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/20">v2.3.1</span>
             </div>
             
             <div class="relative z-50">
@@ -145,11 +146,9 @@
                         <path class="circle-bg stroke-[3px]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                         <path id="efficiency-circle" class="circle stroke-primary stroke-[3px]" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
                     </svg>
-                    
                     <div class="absolute inset-0 flex flex-col justify-end items-center z-10 pb-[50%]">
                         <span id="dash-efficiency-val" class="text-5xl font-extrabold tracking-tighter leading-none translate-y-1">--</span>
                     </div>
-                    
                     <div class="absolute inset-0 flex items-end justify-center z-10 pb-12">
                         <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">km/l</span>
                     </div>
@@ -1096,3 +1095,64 @@
             const interval = parseFloat(document.getElementById('setting-interval').value);
             
             if (isNaN(newInitOdo)) return;
+
+            const oldInitOdo = appData.settings.initialOdometer;
+            if (newInitOdo !== oldInitOdo && appData.refills.length > 0) {
+                const diff = newInitOdo - oldInitOdo;
+                showCustomConfirm(`Has cambiado el odómetro inicial.\n\n¿Ajustar también todos los registros históricos (${diff > 0 ? '+' : ''}${diff} km)?`, () => {
+                    appData.refills.forEach(r => r.odometer += diff);
+                    saveSettingsCommit(newInitOdo, lastServ, interval);
+                    showToast(`Historial ajustado`);
+                });
+                return; 
+            }
+
+            saveSettingsCommit(newInitOdo, lastServ, interval);
+        }
+
+        function saveSettingsCommit(initOdo, lastServ, interval) {
+            appData.settings.initialOdometer = initOdo;
+            if (!isNaN(lastServ)) appData.settings.lastServiceKm = lastServ;
+            if (!isNaN(interval)) appData.settings.serviceInterval = interval;
+            saveData(); 
+            showToast("Ajustes guardados");
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const node = document.createElement('a'); node.setAttribute("href", dataStr);
+            node.setAttribute("download", "fuel_backup.json"); document.body.appendChild(node);
+            node.click(); node.remove();
+        }
+
+        // --- CSV EXPORT ---
+        function exportCSV() {
+            if (appData.refills.length === 0) { showToast("No hay datos para exportar", "error"); return; }
+            let csv = "Fecha,Odometro,Litros,Costo,Precio/L,Gasolinera,Tipo,Notas\n";
+            appData.refills.forEach(r => {
+                const price = (r.cost / r.volume).toFixed(2);
+                csv += `${r.date},${r.odometer},${r.volume},${r.cost},${price},"${r.location}",${r.type},"${r.notes || ''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "fuel_data.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importData(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (json.refills) { appData = json; saveData(); showToast("Datos restaurados"); setTimeout(()=>location.reload(), 1000); }
+                } catch (err) { showToast("Error de archivo", "error"); }
+            }; reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
